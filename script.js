@@ -66,7 +66,10 @@ const progressBar = document.getElementById("progress-bar");
 
 // IMPORTANT: Your Google Apps Script Web App URL
 // (Use the deployed URL ending in '/exec')
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwf8ES1mEXrYfXqnYfj67xsCGKBHeoJhgHaNQ_YtI8nPicINqY00BpFmjJWVXENObvyFQ/exec";
+
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYm1elCxX3K_pQpIBGyNhJCwxFAu12anKwy7UEIQeAvFPfQ0mxdqfLvay7BMJrZF1-8A/exec";
+
 
 /*****************************************************
  * 2) HELPER: SHUFFLE
