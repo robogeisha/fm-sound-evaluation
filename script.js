@@ -68,7 +68,9 @@ const progressBar = document.getElementById("progress-bar");
 // (Use the deployed URL ending in '/exec')
 
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQhgwgEU5g65Hep6-YFeoO-ens4d6yVtZPT1fOBi99_kOWwgLMhQBYgsDWXECzV801og/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQDZ7FQvm5H_Ac5SLaxNEdlM2WLxkt9vIit9Huh4dW0e63NeqcXr4j6lFI3CKPSZJ0yw/exec";
+
+
 
 
 
