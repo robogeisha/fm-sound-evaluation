@@ -71,6 +71,7 @@ const progressBar = document.getElementById("progress-bar");
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYm1elCxX3K_pQpIBGyNhJCwxFAu12anKwy7UEIQeAvFPfQ0mxdqfLvay7BMJrZF1-8A/exec";
 
 
+
 /*****************************************************
  * 2) HELPER: SHUFFLE
  *****************************************************/
@@ -409,11 +410,14 @@ function collectQuestionnaireAndSend() {
     forcedChoiceResponses: responses
   };
 
+
+
+
   // Instead of downloading the JSON locally, we send it to Google Apps Script
   fetch(APPS_SCRIPT_URL, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "text/plain"
     },
     body: JSON.stringify(fullData)
   })
