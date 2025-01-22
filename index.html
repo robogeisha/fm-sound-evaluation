@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Drum Sound Perception Test (2AFC)</title>
-  <!-- Optional: Link to external CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"><!-- Optional -->
 </head>
 <body>
+
+  <!-- Your main container for the test -->
   <div id="slide-container"></div>
 
   <div id="progress-container">
@@ -15,7 +16,20 @@
 
   <div id="nav-buttons"></div>
 
-  <!-- Include your test logic -->
+  <!-- 
+    1) HIDDEN HTML FORM
+       - "action" must be your Apps Script /exec URL
+       - "method=POST"
+       - <input name="data"> is the parameter your script reads
+  -->
+  <form id="myForm"
+        action="https://script.google.com/macros/s/AKfycbwYm1elCxX3K_pQpIBGyNhJCwxFAu12anKwy7UEIQeAvFPfQ0mxdqfLvay7BMJrZF1-8A/exec"
+        method="POST"
+        style="display: none;">
+    <input type="hidden" name="data" id="hiddenData" />
+  </form>
+
+  <!-- Your main test logic -->
   <script src="script.js"></script>
 </body>
 </html>
