@@ -413,31 +413,26 @@ function collectQuestionnaireAndSend() {
 
 
 
-  // Instead of downloading the JSON locally, we send it to Google Apps Script
-  fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "text/plain"
-    },
-    body: JSON.stringify(fullData)
-  })
-  .then(res => res.json())
-  .then(response => {
-    console.log("Response from Apps Script:", response);
 
-    // Show final "Thank You" screen
-    container.innerHTML = `
-      <div class="centered">
-        <h2>Thank You!</h2>
-        <p>Your data has been saved to Google Drive.</p>
-      </div>
-    `;
-  })
-  .catch(err => {
-    console.error("Error sending data:", err);
-    alert("Oops, there was an error saving your data. Please try again.");
-  });
-}
+fetch(APPS_SCRIPT_URL, {
+  method: "POST",
+  mode: "no-cors",  // <--- important
+  headers: {
+    // Must be "simple" headers if you do no-cors
+    "Content-Type": "text/plain"
+  },
+  body: JSON.stringify(fullData)
+})
+.then(() => {
+   // You won't get a real response, but at least your code continues
+   console.log("Attempted no-cors request");
+   container.innerHTML = "<h2>Thank you!</h2><p>We attempted to save your data.</p>";
+})
+.catch(err => {
+   console.error("Error sending data in no-cors mode:", err);
+   alert("Oops, something prevented even the no-cors request from going out.");
+});
+
 
 /*****************************************************
  * INIT: Show Intro on page load
