@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Drum Sound Perception Test (2AFC)</title>
-  <link rel="stylesheet" href="style.css"><!-- Optional -->
+  <!-- Optional CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Your main container for the test -->
+  <!-- Main container for your test -->
   <div id="slide-container"></div>
 
   <div id="progress-container">
@@ -17,21 +17,19 @@
   <div id="nav-buttons"></div>
 
   <!-- 
-    1) HIDDEN HTML FORM
-       - "action" must be your Apps Script /exec URL
-       - "method=POST"
-       - <input name="data"> is the parameter your script reads
+    Hidden form to bypass CORS
+    - action="..." is your Apps Script Web App URL (ends with /exec)
+    - method="POST"
+    - <input name="data" id="hiddenData"> holds the JSON
   -->
   <form id="myForm"
-        action="https://script.google.com/macros/s/AKfycbyQDZ7FQvm5H_Ac5SLaxNEdlM2WLxkt9vIit9Huh4dW0e63NeqcXr4j6lFI3CKPSZJ0yw/exec"
+        action="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"
         method="POST"
-        style="display: none;">
+        style="display:none;">
     <input type="hidden" name="data" id="hiddenData" />
   </form>
 
-  <!-- Your main test logic -->
+  <!-- Test logic -->
   <script src="script.js"></script>
 </body>
 </html>
-
-
