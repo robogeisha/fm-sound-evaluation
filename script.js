@@ -1,537 +1,438 @@
-const slides = [];
-const responses = [];
+/*****************************************************
+ * 1) GLOBAL VARIABLES
+ *****************************************************/
+let userData = {
+  hearing: "",
+  musicTrainingYears: "",
+  productionExp: "",
+  device: "",
+  environment: "",
+  confidence: "",
+  difficulty: "",
+  fatigue: ""
+};
 
-// Define drum types with their specific metrics and samples
-const drumTypes = [
-    {
-        name: 'Kick Drum',
-        intro: 'You will now be shown kick drums over different frequencies.',
-        evaluationCriteria: `
-            <h3>Kick Drum Evaluation Criteria</h3>
-            <p><strong>Punch/Impact:</strong> Think of the "thump" you feel in your chest when you hear a strong kick drum. Does it feel powerful and energetic?</p>
-            
-            <p><strong>Sub-Resonance:</strong> This is the deep, bassy "boom" that makes the kick sound full and heavy. Does it feel rich and deep, or thin and weak?</p>
-            
-            <p><strong>Decay/Tightness:</strong> After the kick hits, how quickly does the sound fade? A "tight" kick fades quickly, while a resonant kick lasts longer.</p>
-            
-            <p><strong>Clarity:</strong> Can you hear the details in the kick, or does it sound muddy or unclear?</p>
-            
-            <p><strong>Overall Preference:</strong> Simply, how much do you like this kick drum?</p>
-        `,
-        metrics: [
-            { name: "Punch/Impact", leftLabel: "Reference is punchier", rightLabel: "Test sample is punchier" },
-            { name: "Sub-Resonance", leftLabel: "Reference has more sub-resonance", rightLabel: "Test sample has more sub-resonance" },
-            { name: "Decay/Tightness", leftLabel: "Reference has tighter decay", rightLabel: "Test sample has tighter decay" },
-            { name: "Clarity", leftLabel: "Reference is clearer", rightLabel: "Test sample is clearer" },
-            { name: "Overall Preference", leftLabel: "Prefer reference", rightLabel: "Prefer test sample" }
-        ],
-        samples: [
-            {
-                ref: "drum_samples/Kick_50Hz_50Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Kick_50Hz_45Hz_Close.wav",
-                    "drum_samples/Kick_50Hz_55Hz_Close.wav",
-                    "drum_samples/Kick_50Hz_70Hz_Distant.wav",
-                    "drum_samples/Kick_50Hz_90Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Kick_60Hz_60Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Kick_60Hz_55Hz_Close.wav",
-                    "drum_samples/Kick_60Hz_65Hz_Close.wav",
-                    "drum_samples/Kick_60Hz_80Hz_Distant.wav",
-                    "drum_samples/Kick_60Hz_90Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Kick_70Hz_70Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Kick_70Hz_65Hz_Close.wav",
-                    "drum_samples/Kick_70Hz_75Hz_Close.wav",
-                    "drum_samples/Kick_70Hz_85Hz_Distant.wav",
-                    "drum_samples/Kick_70Hz_95Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Kick_80Hz_80Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Kick_80Hz_75Hz_Close.wav",
-                    "drum_samples/Kick_80Hz_85Hz_Close.wav",
-                    "drum_samples/Kick_80Hz_90Hz_Distant.wav",
-                    "drum_samples/Kick_80Hz_100Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Kick_90Hz_90Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Kick_90Hz_85Hz_Close.wav",
-                    "drum_samples/Kick_90Hz_95Hz_Close.wav",
-                    "drum_samples/Kick_90Hz_100Hz_Distant.wav",
-                    "drum_samples/Kick_90Hz_120Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Kick_100Hz_100Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Kick_100Hz_95Hz_Close.wav",
-                    "drum_samples/Kick_100Hz_105Hz_Close.wav",
-                    "drum_samples/Kick_100Hz_110Hz_Distant.wav",
-                    "drum_samples/Kick_100Hz_120Hz_Far Distant.wav"
-                ]
-            }
-        ]
-    },
-    {
-        name: 'Snare Drum',
-        intro: 'You will now be shown snare drums over different frequencies.',
-        evaluationCriteria: `
-            <h3>Snare Drum Evaluation Criteria</h3>
-            <p><strong>Crack/Snap:</strong> This is the sharp "pop" or "crack" you hear when the snare is hit. Does it cut through sharply or feel dull?.</p>
-            
-            <p><strong>Body:</strong> This refers to the snare’s warmth and fullness beyond the initial crack. Does it feel balanced and rich or thin and empty?.</p>
-            
-            <p><strong>Texture/Grain:</strong> The subtle "buzz" or "sizzle" in the snare’s sound, often from the snare wires. Does it sound lively and textured or flat?.</p>
-            
-            <p><strong>Decay/Gate:</strong> How long does the sound last after the initial hit? A short decay feels punchier, while a longer one adds resonance..</p>
-            
-            <p><strong>Overall Preference:</strong> Your personal enjoyment of the sound.</p>
-        `,
-        metrics: [
-            { name: "Crack/Snap", leftLabel: "Reference has more crack/snap", rightLabel: "Test sample has more crack/snap" },
-            { name: "Body", leftLabel: "Reference has fuller body", rightLabel: "Test sample has fuller body" },
-            { name: "Texture/Grain", leftLabel: "Reference is less textured", rightLabel: "Test sample is more textured" },
-            { name: "Decay/Gate", leftLabel: "Reference has longer decay/gate", rightLabel: "Test sample has longer decay/gate" },
-            { name: "Overall Preference", leftLabel: "Prefer reference", rightLabel: "Prefer test sample" }
-        ],
-        samples: [
-            {
-                ref: "drum_samples/Snare_150Hz_150Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Snare_150Hz_140Hz_Close.wav",
-                    "drum_samples/Snare_150Hz_160Hz_Close.wav",
-                    "drum_samples/Snare_150Hz_180Hz_Distant.wav",
-                    "drum_samples/Snare_150Hz_200Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Snare_200Hz_200Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Snare_200Hz_190Hz_Close.wav",
-                    "drum_samples/Snare_200Hz_210Hz_Close.wav",
-                    "drum_samples/Snare_200Hz_230Hz_Distant.wav",
-                    "drum_samples/Snare_200Hz_250Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Snare_250Hz_250Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Snare_250Hz_240Hz_Close.wav",
-                    "drum_samples/Snare_250Hz_260Hz_Close.wav",
-                    "drum_samples/Snare_250Hz_280Hz_Distant.wav",
-                    "drum_samples/Snare_250Hz_300Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Snare_300Hz_300Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Snare_300Hz_290Hz_Close.wav",
-                    "drum_samples/Snare_300Hz_310Hz_Close.wav",
-                    "drum_samples/Snare_300Hz_330Hz_Distant.wav",
-                    "drum_samples/Snare_300Hz_350Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Snare_350Hz_350Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Snare_350Hz_340Hz_Close.wav",
-                    "drum_samples/Snare_350Hz_360Hz_Close.wav",
-                    "drum_samples/Snare_350Hz_370Hz_Distant.wav",
-                    "drum_samples/Snare_350Hz_400Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Snare_400Hz_400Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Snare_400Hz_390Hz_Close.wav",
-                    "drum_samples/Snare_400Hz_410Hz_Close.wav",
-                    "drum_samples/Snare_400Hz_430Hz_Distant.wav",
-                    "drum_samples/Snare_400Hz_450Hz_Far Distant.wav"
-                ]
-            }
-        ]
-    },
-    {
-        name: 'Tom Drum',
-        intro: 'You will now be shown tom drums over different frequencies.',
-        evaluationCriteria: `
-            <h3>Tom Drum Evaluation Criteria</h3>
-            <p><strong>Body/Resonance:</strong> This is the round, full sound of the tom. Does it feel rich and warm or hollow and empty?</p>
-            
-            <p><strong>Depth:</strong> How deep and powerful the sound feels.</p>
-            
-            <p><strong>Attack Detail:</strong> Sharpness of the initial hit.</p>
-            
-            <p><strong>Texture:</strong> Layering or richness of overtones.</p>
-            
-            <p><strong>Overall Preference:</strong> Your personal enjoyment of the sound.</p>
-        `,
-        metrics: [
-            { name: "Body/Resonance", leftLabel: "Reference has more body/resonance", rightLabel: "Test sample has more body/resonance" },
-            { name: "Depth", leftLabel: "Reference is deeper", rightLabel: "Test sample is deeper" },
-            { name: "Attack Detail", leftLabel: "Reference has more attack detail", rightLabel: "Test sample has more attack detail" },
-            { name: "Texture", leftLabel: "Reference is less textured", rightLabel: "Test sample is more textured" },
-            { name: "Overall Preference", leftLabel: "Prefer reference", rightLabel: "Prefer test sample" }
-        ],
-        samples: [
-            {
-                ref: "drum_samples/Tom_120Hz_120Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Tom_120Hz_110Hz_Close.wav",
-                    "drum_samples/Tom_120Hz_130Hz_Close.wav",
-                    "drum_samples/Tom_120Hz_150Hz_Distant.wav",
-                    "drum_samples/Tom_120Hz_180Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Tom_150Hz_150Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Tom_150Hz_140Hz_Close.wav",
-                    "drum_samples/Tom_150Hz_160Hz_Close.wav",
-                    "drum_samples/Tom_150Hz_180Hz_Distant.wav",
-                    "drum_samples/Tom_150Hz_200Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Tom_200Hz_200Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Tom_200Hz_190Hz_Close.wav",
-                    "drum_samples/Tom_200Hz_210Hz_Close.wav",
-                    "drum_samples/Tom_200Hz_230Hz_Distant.wav",
-                    "drum_samples/Tom_200Hz_250Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Tom_300Hz_300Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Tom_300Hz_290Hz_Close.wav",
-                    "drum_samples/Tom_300Hz_310Hz_Close.wav",
-                    "drum_samples/Tom_300Hz_320Hz_Distant.wav",
-                    "drum_samples/Tom_300Hz_350Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Tom_350Hz_350Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Tom_350Hz_340Hz_Close.wav",
-                    "drum_samples/Tom_350Hz_360Hz_Close.wav",
-                    "drum_samples/Tom_350Hz_370Hz_Distant.wav",
-                    "drum_samples/Tom_350Hz_400Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/Tom_400Hz_400Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/Tom_400Hz_390Hz_Close.wav",
-                    "drum_samples/Tom_400Hz_410Hz_Close.wav",
-                    "drum_samples/Tom_400Hz_430Hz_Distant.wav",
-                    "drum_samples/Tom_400Hz_450Hz_Far Distant.wav"
-                ]
-            }
-        ]
-    },
-    {
-        name: 'Hi-Hat',
-        intro: 'You will now be shown hi-hats over different frequencies.',
-        evaluationCriteria: `
-            <h3>Hi-Hat Evaluation Criteria</h3>
-            <p><strong>Brightness:</strong> Does the hi-hat sound crisp and high-pitched, or dull and muted?</p>
-            
-            <p><strong>Sharpness/Attack:</strong> How clearly can you hear the initial hit? Is it snappy and crisp, or soft and unclear?</p>
-            
-            <p><strong>Decay:</strong> Does the sound fade quickly (like a closed hi-hat) or linger (like an open hi-hat)?</p>
-            
-            <p><strong>Clarity:</strong> Is the hi-hat sound clean and easy to distinguish, or does it feel noisy or muffled?</p>
-            
-            <p><strong>Overall Preference:</strong> How much do you like this hi-hat?</p>
-        `,
-        metrics: [
-            { name: "Brightness", leftLabel: "Reference is brighter", rightLabel: "Test sample is brighter" },
-            { name: "Sharpness/Attack", leftLabel: "Reference has sharper attack", rightLabel: "Test sample has sharper attack" },
-            { name: "Decay", leftLabel: "Reference has longer decay", rightLabel: "Test sample has longer decay" },
-            { name: "Clarity", leftLabel: "Reference is clearer", rightLabel: "Test sample is clearer" },
-            { name: "Overall Preference", leftLabel: "Prefer reference", rightLabel: "Prefer test sample" }
-        ],
-        samples: [
-            {
-                ref: "drum_samples/HiHat_5000Hz_5000Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/HiHat_5000Hz_4900Hz_Close.wav",
-                    "drum_samples/HiHat_5000Hz_5100Hz_Close.wav",
-                    "drum_samples/HiHat_5000Hz_5300Hz_Distant.wav",
-                    "drum_samples/HiHat_5000Hz_5500Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/HiHat_7000Hz_7000Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/HiHat_7000Hz_6900Hz_Close.wav",
-                    "drum_samples/HiHat_7000Hz_7100Hz_Close.wav",
-                    "drum_samples/HiHat_7000Hz_7300Hz_Distant.wav",
-                    "drum_samples/HiHat_7000Hz_7500Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/HiHat_8000Hz_8000Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/HiHat_8000Hz_7900Hz_Close.wav",
-                    "drum_samples/HiHat_8000Hz_8100Hz_Close.wav",
-                    "drum_samples/HiHat_8000Hz_8300Hz_Distant.wav",
-                    "drum_samples/HiHat_8000Hz_8500Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/HiHat_10000Hz_10000Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/HiHat_10000Hz_9900Hz_Close.wav",
-                    "drum_samples/HiHat_10000Hz_10100Hz_Close.wav",
-                    "drum_samples/HiHat_10000Hz_10300Hz_Distant.wav",
-                    "drum_samples/HiHat_10000Hz_10500Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/HiHat_12000Hz_12000Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/HiHat_12000Hz_11900Hz_Close.wav",
-                    "drum_samples/HiHat_12000Hz_12100Hz_Close.wav",
-                    "drum_samples/HiHat_12000Hz_12300Hz_Distant.wav",
-                    "drum_samples/HiHat_12000Hz_12500Hz_Far Distant.wav"
-                ]
-            },
-            {
-                ref: "drum_samples/HiHat_15000Hz_15000Hz_Exact.wav",
-                comparisons: [
-                    "drum_samples/HiHat_15000Hz_14900Hz_Close.wav",
-                    "drum_samples/HiHat_15000Hz_15100Hz_Close.wav",
-                    "drum_samples/HiHat_15000Hz_15300Hz_Distant.wav",
-                    "drum_samples/HiHat_15000Hz_15500Hz_Far Distant.wav"
-                ]
-            }
-        ]
-    }
+// Our 2AFC stimuli & forced-choice data
+const stimuli = [
+  {
+    ref: "fm_kick_samples/Kick_Ref_60Hz_0.5s.wav",
+    fmList: [
+      "fm_kick_samples/Kick_FM_60Hz_0.5s_3HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_60Hz_0.5s_5HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_60Hz_0.5s_9HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_60Hz_0.5s_15HzDepth_10HzRate.wav"
+    ]
+  },
+  {
+    ref: "fm_kick_samples/Kick_Ref_60Hz_1.0s.wav",
+    fmList: [
+      "fm_kick_samples/Kick_FM_60Hz_1.0s_3HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_60Hz_1.0s_5HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_60Hz_1.0s_9HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_60Hz_1.0s_15HzDepth_10HzRate.wav"
+    ]
+  },
+  {
+    ref: "fm_kick_samples/Kick_Ref_100Hz_0.5s.wav",
+    fmList: [
+      "fm_kick_samples/Kick_FM_100Hz_0.5s_3HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_100Hz_0.5s_5HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_100Hz_0.5s_9HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_100Hz_0.5s_15HzDepth_10HzRate.wav"
+    ]
+  },
+  {
+    ref: "fm_kick_samples/Kick_Ref_100Hz_1.0s.wav",
+    fmList: [
+      "fm_kick_samples/Kick_FM_100Hz_1.0s_3HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_100Hz_1.0s_5HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_100Hz_1.0s_9HzDepth_10HzRate.wav",
+      "fm_kick_samples/Kick_FM_100Hz_1.0s_15HzDepth_10HzRate.wav"
+    ]
+  }
 ];
 
+// How many repeats of each FM variant
+const repeats = 4;
 
-// Define introductory slides with centered text and drum emojis
-slides.push({ 
-    type: "text", 
-    content: "<div class='centered'>🥁 Welcome to the Drum Sound Perception Test 🥁</div>" 
-});
-slides.push({ 
-    type: "text", 
-    content: "<div class='centered'>This test investigates how frequency and modulation changes affect the perceived characteristics of produced drum sounds. We highlight the special qualities of every sound, including their interactions within the critical bandwidth—that is, the region where sounds merge or stand out. <br><br> You will assess four different drum sounds, each with certain standards stated at the beginning of its portion. Every sound will have a reference for comparison; you will rate it depending on the stated standards. You can review and change your responses anytime during the test.</div>" 
-});
+// We'll build an array of trials for the forced-choice test
+let trials = [];
+let currentTrial = 0;
+const responses = [];
 
-// Dynamically add slides for each drum type
-drumTypes.forEach(drumType => {
-    // Add introductory slide for the drum type
-    slides.push({ type: "text", content: drumType.intro });
-    
-    // Add evaluation criteria slide on the same page
-    slides.push({ type: "text", content: drumType.evaluationCriteria });
-    
-    // Add comparison slides for each sample set
-    drumType.samples.forEach(sampleSet => {
-        sampleSet.comparisons.forEach(compSample => {
-            slides.push({
-                type: "comparison",
-                drumType: drumType.name,
-                refSample: sampleSet.ref,
-                compSample: compSample,
-                metrics: drumType.metrics
-            });
+// DOM references
+const container   = document.getElementById("slide-container");
+const progressBar = document.getElementById("progress-bar");
+
+// IMPORTANT: Your Google Apps Script Web App URL
+// (Use the deployed URL ending in '/exec')
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwf8ES1mEXrYfXqnYfj67xsCGKBHeoJhgHaNQ_YtI8nPicINqY00BpFmjJWVXENObvyFQ/exec";
+
+/*****************************************************
+ * 2) HELPER: SHUFFLE
+ *****************************************************/
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+/*****************************************************
+ * 3) BUILD TRIALS
+ *****************************************************/
+function buildTrials() {
+  stimuli.forEach(block => {
+    const refFile = block.ref;
+    block.fmList.forEach(fmFile => {
+      for (let i = 0; i < repeats; i++) {
+        const referenceIsA = Math.random() < 0.5;
+        const sampleA = referenceIsA ? refFile : fmFile;
+        const sampleB = referenceIsA ? fmFile : refFile;
+        const correct = referenceIsA ? "B" : "A";
+
+        trials.push({
+          refFile: refFile,
+          fmFile: fmFile,
+          sampleA: sampleA,
+          sampleB: sampleB,
+          correctAnswer: correct
         });
+      }
     });
-});
-
-// Add final thank you slide with centered text and drum emojis
-slides.push({ 
-    type: "text", 
-    content: "<div class='centered'>Thank you for participating! Your responses have been saved. 🥁</div>" 
-});
-
-let currentSlide = 0;
-
-// Load saved responses from localStorage (if any)
-const savedResponses = localStorage.getItem("drumTestResponses");
-if (savedResponses) {
-    responses.push(...JSON.parse(savedResponses));
+  });
+  shuffle(trials);
 }
 
-// Function to load the current slide
-function loadSlide() {
-    const container = document.getElementById("slide-container");
-    container.innerHTML = ""; // Clear previous slide
-    const slide = slides[currentSlide];
+/*****************************************************
+ * 4) PAGE 1: INTRO
+ *****************************************************/
+function showIntro() {
+  container.innerHTML = `
+    <div class="text-slide">
+      <h2>Welcome to the Kick FM Detection Test</h2>
+      <p>
+        In each trial, you will hear two short kick samples:
+        one unmodulated <strong>reference</strong> and one with 
+        <strong>frequency modulation (FM)</strong>.
+      </p>
+      <p>
+        Your task is to identify which sample is modulated by clicking 
+        "Sample A" or "Sample B".
+      </p>
+      <p>
+        Below is an <strong>example</strong> so you can hear 
+        the difference between a reference and a 
+        ±15 Hz modulated kick around 60 Hz:
+      </p>
 
-    // Update progress bar
-    updateProgressBar();
+      <div class="audio-container">
+        <div class="audio-player">
+          <h3>Reference (60 Hz, 0.5s)</h3>
+          <audio controls src="fm_kick_samples/Kick_Ref_60Hz_0.5s.wav"></audio>
+        </div>
+        <div class="audio-player">
+          <h3>Modulated (±15 Hz)</h3>
+          <audio controls src="fm_kick_samples/Kick_FM_60Hz_0.5s_15HzDepth_10HzRate.wav"></audio>
+        </div>
+      </div>
 
-    if (slide.type === "text") {
-        container.innerHTML = `<div class="text-slide">${slide.content}</div>`;
-    } else if (slide.type === "comparison") {
-        container.innerHTML = `
-            <h2>${slide.drumType} Evaluation</h2>
-            <div class="audio-container">
-                <div class="audio-player">
-                    <h3>Reference</h3>
-                    <audio controls src="${slide.refSample}"></audio>
-                </div>
-                <div class="audio-player">
-                    <h3>Test Sample</h3>
-                    <audio controls src="${slide.compSample}"></audio>
-                </div>
-            </div>
-        `;
+      <p>
+        Listen to both samples above to get a feel for 
+        how <strong>pitch modulation</strong> might sound. 
+        Some of the modulations will be subtle. 
+        Do not overthink. <strong>You can only hear each sample twice in the actual test.</strong>
+        <br><br>
+        When you click "Continue", you'll see environment instructions,
+        then proceed to the main test. Afterwards, you'll fill out a short questionnaire.
+      </p>
 
-        slide.metrics.forEach(metric => {
-            container.innerHTML += `
-                <div class="metric-section">
-                    <label class="metric-label">${metric.name}</label>
-                    <div class="slider-container">
-                        <span class="slider-label left">${metric.leftLabel}</span>
-                        <input 
-                            type="range" 
-                            min="1" 
-                            max="5" 
-                            step="0.1" 
-                            value="3" 
-                            data-metric="${metric.name}" 
-                            aria-label="${metric.name}"
-                        >
-                        <span class="slider-label right">${metric.rightLabel}</span>
-                    </div>
-                </div>
-            `;
-        });
+      <button id="introNext" class="btn">Continue</button>
+    </div>
+  `;
+  progressBar.style.width = "0%";
 
-        // Restore previous responses if navigating back
-        const response = responses.find(r => 
-            r.drumType === slide.drumType && 
-            r.refSample === slide.refSample && 
-            r.compSample === slide.compSample
-        );
-        if (response) {
-            slide.metrics.forEach(metric => {
-                const slider = document.querySelector(`input[data-metric="${metric.name}"]`);
-                if (slider && response[metric.name]) {
-                    slider.value = response[metric.name];
-                }
-            });
-        }
-    }
-
-    // Update navigation buttons
-    updateNavButtons();
+  document.getElementById("introNext").addEventListener("click", showEnvironmentPage);
 }
 
-// Function to update the progress bar
-function updateProgressBar() {
-    const progressBar = document.getElementById("progress-bar");
-    const progressPercent = ((currentSlide) / (slides.length - 1)) * 100;
-    progressBar.style.width = `${progressPercent}%`;
+/*****************************************************
+ * 5) PAGE 2: ENVIRONMENT PAGE
+ *****************************************************/
+function showEnvironmentPage() {
+  container.innerHTML = `
+    <div class="text-slide">
+      <h2>Listening Environment & Equipment</h2>
+      <p><strong>Recommended Setup:</strong></p>
+      <ul style="text-align:left;">
+        <li>Use <strong>headphones or speakers</strong> that can reproduce 
+            low-bass frequencies (below ~50 Hz). No basic laptop speakers!
+        </li>
+        <li>Set your listening volume at a comfortable level 
+            where you can hear subtle pitch changes.
+        </li>
+        <li>Choose a <strong>quiet environment</strong> with minimal background noise.</li>
+      </ul>
+      <p>Click "Start Test" when you're ready to begin the trials.</p>
+      <button id="envNext" class="btn">Start Test</button>
+    </div>
+  `;
+  progressBar.style.width = "0%";
+
+  document.getElementById("envNext").addEventListener("click", startTest);
 }
 
-// Function to update the navigation buttons' state and text
-function updateNavButtons() {
-    const prevButton = document.getElementById("prev-button");
-    const nextButton = document.getElementById("next-button");
-
-    // Disable Previous button on the first slide
-    if (currentSlide === 0) {
-        prevButton.disabled = true;
-    } else {
-        prevButton.disabled = false;
-    }
-
-    // Change Next button text to "Submit" on the last slide
-    if (currentSlide === slides.length - 1) {
-        nextButton.textContent = "Submit";
-    } else {
-        nextButton.textContent = "Next";
-    }
+/*****************************************************
+ * 6) START THE 2AFC TEST
+ *****************************************************/
+function startTest() {
+  buildTrials();
+  loadTrial();
 }
 
-// Function to save the current response
-function saveResponse() {
-    const slide = slides[currentSlide];
-    if (slide.type === "comparison") {
-        const audioResponses = { 
-            drumType: slide.drumType, 
-            refSample: slide.refSample, 
-            compSample: slide.compSample 
-        };
-        document.querySelectorAll("input[type=range]").forEach(input => {
-            audioResponses[input.dataset.metric] = parseFloat(input.value);
-        });
+/*****************************************************
+ * 7) LOAD A TRIAL (ENFORCE 2-PLAY LIMIT)
+ *****************************************************/
+function loadTrial() {
+  if (currentTrial >= trials.length) {
+    endTest();
+    return;
+  }
 
-        // Remove existing response for the same comparison to prevent duplicates
-        const existingIndex = responses.findIndex(r => 
-            r.drumType === audioResponses.drumType && 
-            r.refSample === audioResponses.refSample && 
-            r.compSample === audioResponses.compSample
-        );
-        if (existingIndex !== -1) {
-            responses.splice(existingIndex, 1);
-        }
+  const percent = (currentTrial / trials.length) * 100;
+  progressBar.style.width = `${percent}%`;
 
-        responses.push(audioResponses);
+  const trial = trials[currentTrial];
 
-        // Save to localStorage
-        localStorage.setItem("drumTestResponses", JSON.stringify(responses));
-    }
+  container.innerHTML = `
+    <div style="text-align: center;">
+      <h2>Trial ${currentTrial + 1} of ${trials.length}</h2>
+      <p>You can only play each sample <strong>twice</strong>. Which sample is modulated?</p>
+    </div>
+
+    <div class="audio-container">
+      <div class="audio-player">
+        <h3>Sample A</h3>
+        <audio id="audioA" controls src="${trial.sampleA}"></audio>
+      </div>
+      <div class="audio-player">
+        <h3>Sample B</h3>
+        <audio id="audioB" controls src="${trial.sampleB}"></audio>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <button id="buttonA" class="btn">Sample A</button>
+      <button id="buttonB" class="btn">Sample B</button>
+    </div>
+  `;
+
+  // We'll store local play counts for each sample in this trial
+  const localPlayCount = {
+    [trial.sampleA]: 0,
+    [trial.sampleB]: 0
+  };
+
+  // Get references to the audio elements
+  const audioA = document.getElementById("audioA");
+  const audioB = document.getElementById("audioB");
+
+  // Attach "play" listeners to enforce 2-play limit
+  audioA.addEventListener("play", () => handlePlay(trial.sampleA, audioA, localPlayCount));
+  audioB.addEventListener("play", () => handlePlay(trial.sampleB, audioB, localPlayCount));
+
+  // Handle forced-choice responses
+  document.getElementById("buttonA").addEventListener("click", () => handleResponse("A"));
+  document.getElementById("buttonB").addEventListener("click", () => handleResponse("B"));
 }
 
-// Function to go to the next slide
-function nextSlide() {
-    saveResponse();
-    if (currentSlide < slides.length - 1) {
-        currentSlide++;
-        loadSlide();
-    } else {
-        exportResults();
-    }
+/*****************************************************
+ * 8) ENFORCE TWO-PLAY LIMIT
+ *****************************************************/
+function handlePlay(url, audioElem, localPlayCount) {
+  // Increment local play count
+  localPlayCount[url]++;
+
+  // If user tries to play more than 2 times, pause & disable
+  if (localPlayCount[url] > 2) {
+    audioElem.pause();
+    audioElem.currentTime = 0;
+    audioElem.controls = false;  // Hide or disable controls
+  }
 }
 
-// Function to go to the previous slide
-function prevSlide() {
-    if (currentSlide > 0) {
-        currentSlide--;
-        loadSlide();
-    }
+/*****************************************************
+ * 9) HANDLE A RESPONSE
+ *****************************************************/
+function handleResponse(chosen) {
+  const trial = trials[currentTrial];
+  const isCorrect = (chosen === trial.correctAnswer);
+
+  responses.push({
+    trialIndex: currentTrial,
+    refFile: trial.refFile,
+    fmFile: trial.fmFile,
+    sampleA: trial.sampleA,
+    sampleB: trial.sampleB,
+    correctAnswer: trial.correctAnswer,
+    chosen: chosen,
+    isCorrect: isCorrect,
+    timestamp: new Date().toISOString()
+  });
+
+  currentTrial++;
+  loadTrial();
 }
 
-// Function to export the results as a JSON file and clear localStorage
-function exportResults() {
-    const blob = new Blob([JSON.stringify(responses, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "responses.json";
-    a.click();
-    URL.revokeObjectURL(url);
-
-    // Show a completion message
-    const container = document.getElementById("slide-container");
-    container.innerHTML = `<div class="centered">Thank you for completing the test! Your responses have been saved. 🥁</div>`;
-
-    // Disable navigation buttons after submission
-    const navButtons = document.getElementById("nav-buttons");
-    navButtons.innerHTML = ""; // Remove buttons
-
-    // Clear localStorage
-    localStorage.removeItem("drumTestResponses");
+/*****************************************************
+ * 10) END TEST → SHOW QUESTIONNAIRE
+ *****************************************************/
+function endTest() {
+  progressBar.style.width = "100%";
+  showQuestionnaire();
 }
 
-// Initialize the first slide on page load
-window.onload = loadSlide;
+/*****************************************************
+ * 11) QUESTIONNAIRE PAGE
+ *****************************************************/
+function showQuestionnaire() {
+  container.innerHTML = `
+    <div class="text-slide" style="text-align:left;">
+      <h2>Final Questionnaire</h2>
+      <p>Please answer the following now that you've completed the test.</p>
+
+      <label for="hearingSelect"><strong>Do you have normal hearing?</strong></label><br>
+      <select id="hearingSelect">
+        <option value="">-- Select an option --</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+        <option value="Unsure">Unsure</option>
+      </select>
+      <br><br>
+
+      <label for="musicSelect"><strong>Have you had formal musical training (years)?</strong></label><br>
+      <select id="musicSelect">
+        <option value="">-- Select --</option>
+        <option value="0">0 (none)</option>
+        <option value="1-3">1-3</option>
+        <option value="4-6">4-6</option>
+        <option value="7plus">7+</option>
+      </select>
+      <br><br>
+
+      <label for="productionSelect"><strong>Experience with Audio Production?</strong></label><br>
+      <select id="productionSelect">
+        <option value="">-- Select --</option>
+        <option value="None">None</option>
+        <option value="Basic">Basic (hobby)</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Professional">Professional</option>
+      </select>
+      <br><br>
+
+      <label for="deviceSelect"><strong>Listening Device?</strong></label><br>
+      <select id="deviceSelect">
+        <option value="">-- Select --</option>
+        <option value="Headphones">Headphones</option>
+        <option value="Speakers">Speakers</option>
+      </select>
+      <br><br>
+
+      <label for="envSelect"><strong>Listening Environment?</strong></label><br>
+      <select id="envSelect">
+        <option value="">-- Select --</option>
+        <option value="Quiet">Quiet</option>
+        <option value="Some Noise">Some Noise</option>
+        <option value="Noisy">Noisy</option>
+      </select>
+      <br><br>
+
+      <label for="confidenceSelect"><strong>Your Overall Confidence? (1=low, 5=high)</strong></label><br>
+      <select id="confidenceSelect">
+        <option value="">-- Select --</option>
+        <option value="1">1 (Not confident)</option>
+        <option value="2">2</option>
+        <option value="3">3 (Somewhat confident)</option>
+        <option value="4">4</option>
+        <option value="5">5 (Very confident)</option>
+      </select>
+      <br><br>
+
+      <label for="difficultySelect"><strong>Difficulty of the Test? (1=easy, 5=hard)</strong></label><br>
+      <select id="difficultySelect">
+        <option value="">-- Select --</option>
+        <option value="1">1 (Very easy)</option>
+        <option value="2">2</option>
+        <option value="3">3 (Moderate)</option>
+        <option value="4">4</option>
+        <option value="5">5 (Very difficult)</option>
+      </select>
+      <br><br>
+
+      <label for="fatigueSelect"><strong>How tiring was the test? (1=not, 5=extremely)</strong></label><br>
+      <select id="fatigueSelect">
+        <option value="">-- Select --</option>
+        <option value="1">1 (No fatigue)</option>
+        <option value="2">2</option>
+        <option value="3">3 (Moderate)</option>
+        <option value="4">4</option>
+        <option value="5">5 (Very fatigued)</option>
+      </select>
+      <br><br>
+
+      <button id="finishButton" class="btn">Finish</button>
+    </div>
+  `;
+
+  document.getElementById("finishButton").addEventListener("click", collectQuestionnaireAndSend);
+}
+
+/*****************************************************
+ * 12) COLLECT & SEND DATA TO GOOGLE APPS SCRIPT
+ *****************************************************/
+function collectQuestionnaireAndSend() {
+  // Collect user data
+  userData.hearing            = document.getElementById("hearingSelect").value;
+  userData.musicTrainingYears = document.getElementById("musicSelect").value;
+  userData.productionExp      = document.getElementById("productionSelect").value;
+  userData.device             = document.getElementById("deviceSelect").value;
+  userData.environment        = document.getElementById("envSelect").value;
+  userData.confidence         = document.getElementById("confidenceSelect").value;
+  userData.difficulty         = document.getElementById("difficultySelect").value;
+  userData.fatigue            = document.getElementById("fatigueSelect").value;
+
+  // Combine user data + forced-choice responses
+  const fullData = {
+    userData: userData,
+    forcedChoiceResponses: responses
+  };
+
+  // Instead of downloading the JSON locally, we send it to Google Apps Script
+  fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(fullData)
+  })
+  .then(res => res.json())
+  .then(response => {
+    console.log("Response from Apps Script:", response);
+
+    // Show final "Thank You" screen
+    container.innerHTML = `
+      <div class="centered">
+        <h2>Thank You!</h2>
+        <p>Your data has been saved to Google Drive.</p>
+      </div>
+    `;
+  })
+  .catch(err => {
+    console.error("Error sending data:", err);
+    alert("Oops, there was an error saving your data. Please try again.");
+  });
+}
+
+/*****************************************************
+ * INIT: Show Intro on page load
+ *****************************************************/
+window.onload = showIntro;
