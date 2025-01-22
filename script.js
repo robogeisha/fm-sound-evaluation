@@ -12,7 +12,6 @@ let userData = {
   fatigue: ""
 };
 
-// Our 2AFC stimuli & forced-choice data
 const stimuli = [
   {
     ref: "fm_kick_samples/Kick_Ref_60Hz_0.5s.wav",
@@ -52,10 +51,7 @@ const stimuli = [
   }
 ];
 
-// How many repeats of each FM variant
 const repeats = 4;
-
-// We'll build an array of trials for the forced-choice test
 let trials = [];
 let currentTrial = 0;
 const responses = [];
@@ -64,13 +60,7 @@ const responses = [];
 const container   = document.getElementById("slide-container");
 const progressBar = document.getElementById("progress-bar");
 
-// IMPORTANT: Your Google Apps Script Web App URL
-// (Use the deployed URL ending in '/exec')
-
-
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYm1elCxX3K_pQpIBGyNhJCwxFAu12anKwy7UEIQeAvFPfQ0mxdqfLvay7BMJrZF1-8A/exec";
-
-
+// NO direct fetch needed, we'll do a form POST instead
 
 /*****************************************************
  * 2) HELPER: SHUFFLE
@@ -109,7 +99,7 @@ function buildTrials() {
 }
 
 /*****************************************************
- * 4) PAGE 1: INTRO
+ * 4) INTRO PAGE
  *****************************************************/
 function showIntro() {
   container.innerHTML = `
@@ -145,10 +135,10 @@ function showIntro() {
         Listen to both samples above to get a feel for 
         how <strong>pitch modulation</strong> might sound. 
         Some of the modulations will be subtle. 
-        Do not overthink. <strong>You can only hear each sample twice in the actual test.</strong>
+        You can only play each sample <strong>twice</strong> during the test.
         <br><br>
         When you click "Continue", you'll see environment instructions,
-        then proceed to the main test. Afterwards, you'll fill out a short questionnaire.
+        then the main test. Afterwards, there's a short questionnaire.
       </p>
 
       <button id="introNext" class="btn">Continue</button>
@@ -160,7 +150,7 @@ function showIntro() {
 }
 
 /*****************************************************
- * 5) PAGE 2: ENVIRONMENT PAGE
+ * 5) ENVIRONMENT PAGE
  *****************************************************/
 function showEnvironmentPage() {
   container.innerHTML = `
@@ -169,14 +159,14 @@ function showEnvironmentPage() {
       <p><strong>Recommended Setup:</strong></p>
       <ul style="text-align:left;">
         <li>Use <strong>headphones or speakers</strong> that can reproduce 
-            low-bass frequencies (below ~50 Hz). No basic laptop speakers!
+            low-bass frequencies (below ~50 Hz).
         </li>
         <li>Set your listening volume at a comfortable level 
             where you can hear subtle pitch changes.
         </li>
         <li>Choose a <strong>quiet environment</strong> with minimal background noise.</li>
       </ul>
-      <p>Click "Start Test" when you're ready to begin the trials.</p>
+      <p>Click "Start Test" when you're ready.</p>
       <button id="envNext" class="btn">Start Test</button>
     </div>
   `;
@@ -194,7 +184,7 @@ function startTest() {
 }
 
 /*****************************************************
- * 7) LOAD A TRIAL (ENFORCE 2-PLAY LIMIT)
+ * 7) LOAD A TRIAL
  *****************************************************/
 function loadTrial() {
   if (currentTrial >= trials.length) {
@@ -230,42 +220,38 @@ function loadTrial() {
     </div>
   `;
 
-  // We'll store local play counts for each sample in this trial
+  // We'll store local play counts for each sample
   const localPlayCount = {
     [trial.sampleA]: 0,
     [trial.sampleB]: 0
   };
 
-  // Get references to the audio elements
+  // Enforce 2-play limit
   const audioA = document.getElementById("audioA");
   const audioB = document.getElementById("audioB");
 
-  // Attach "play" listeners to enforce 2-play limit
   audioA.addEventListener("play", () => handlePlay(trial.sampleA, audioA, localPlayCount));
   audioB.addEventListener("play", () => handlePlay(trial.sampleB, audioB, localPlayCount));
 
-  // Handle forced-choice responses
+  // Choice
   document.getElementById("buttonA").addEventListener("click", () => handleResponse("A"));
   document.getElementById("buttonB").addEventListener("click", () => handleResponse("B"));
 }
 
 /*****************************************************
- * 8) ENFORCE TWO-PLAY LIMIT
+ * 8) ENFORCE 2-PLAY LIMIT
  *****************************************************/
 function handlePlay(url, audioElem, localPlayCount) {
-  // Increment local play count
   localPlayCount[url]++;
-
-  // If user tries to play more than 2 times, pause & disable
   if (localPlayCount[url] > 2) {
     audioElem.pause();
     audioElem.currentTime = 0;
-    audioElem.controls = false;  // Hide or disable controls
+    audioElem.controls = false; 
   }
 }
 
 /*****************************************************
- * 9) HANDLE A RESPONSE
+ * 9) HANDLE RESPONSE
  *****************************************************/
 function handleResponse(chosen) {
   const trial = trials[currentTrial];
@@ -288,7 +274,7 @@ function handleResponse(chosen) {
 }
 
 /*****************************************************
- * 10) END TEST → SHOW QUESTIONNAIRE
+ * 10) END TEST
  *****************************************************/
 function endTest() {
   progressBar.style.width = "100%";
@@ -296,7 +282,7 @@ function endTest() {
 }
 
 /*****************************************************
- * 11) QUESTIONNAIRE PAGE
+ * 11) QUESTIONNAIRE
  *****************************************************/
 function showQuestionnaire() {
   container.innerHTML = `
@@ -304,26 +290,26 @@ function showQuestionnaire() {
       <h2>Final Questionnaire</h2>
       <p>Please answer the following now that you've completed the test.</p>
 
-      <label for="hearingSelect"><strong>Do you have normal hearing?</strong></label><br>
+      <label><strong>Normal Hearing?</strong></label><br>
       <select id="hearingSelect">
-        <option value="">-- Select an option --</option>
+        <option value="">-- Select --</option>
         <option value="Yes">Yes</option>
         <option value="No">No</option>
         <option value="Unsure">Unsure</option>
       </select>
       <br><br>
 
-      <label for="musicSelect"><strong>Have you had formal musical training (years)?</strong></label><br>
+      <label><strong>Musical Training (years)?</strong></label><br>
       <select id="musicSelect">
         <option value="">-- Select --</option>
-        <option value="0">0 (none)</option>
+        <option value="0">0</option>
         <option value="1-3">1-3</option>
         <option value="4-6">4-6</option>
         <option value="7plus">7+</option>
       </select>
       <br><br>
 
-      <label for="productionSelect"><strong>Experience with Audio Production?</strong></label><br>
+      <label><strong>Audio Production Experience?</strong></label><br>
       <select id="productionSelect">
         <option value="">-- Select --</option>
         <option value="None">None</option>
@@ -333,7 +319,7 @@ function showQuestionnaire() {
       </select>
       <br><br>
 
-      <label for="deviceSelect"><strong>Listening Device?</strong></label><br>
+      <label><strong>Listening Device?</strong></label><br>
       <select id="deviceSelect">
         <option value="">-- Select --</option>
         <option value="Headphones">Headphones</option>
@@ -341,7 +327,7 @@ function showQuestionnaire() {
       </select>
       <br><br>
 
-      <label for="envSelect"><strong>Listening Environment?</strong></label><br>
+      <label><strong>Environment?</strong></label><br>
       <select id="envSelect">
         <option value="">-- Select --</option>
         <option value="Quiet">Quiet</option>
@@ -350,36 +336,36 @@ function showQuestionnaire() {
       </select>
       <br><br>
 
-      <label for="confidenceSelect"><strong>Your Overall Confidence? (1=low, 5=high)</strong></label><br>
+      <label><strong>Confidence? (1=low, 5=high)</strong></label><br>
       <select id="confidenceSelect">
         <option value="">-- Select --</option>
-        <option value="1">1 (Not confident)</option>
+        <option value="1">1</option>
         <option value="2">2</option>
-        <option value="3">3 (Somewhat confident)</option>
+        <option value="3">3</option>
         <option value="4">4</option>
-        <option value="5">5 (Very confident)</option>
+        <option value="5">5</option>
       </select>
       <br><br>
 
-      <label for="difficultySelect"><strong>Difficulty of the Test? (1=easy, 5=hard)</strong></label><br>
+      <label><strong>Difficulty? (1=easy, 5=hard)</strong></label><br>
       <select id="difficultySelect">
         <option value="">-- Select --</option>
-        <option value="1">1 (Very easy)</option>
+        <option value="1">1</option>
         <option value="2">2</option>
-        <option value="3">3 (Moderate)</option>
+        <option value="3">3</option>
         <option value="4">4</option>
-        <option value="5">5 (Very difficult)</option>
+        <option value="5">5</option>
       </select>
       <br><br>
 
-      <label for="fatigueSelect"><strong>How tiring was the test? (1=not, 5=extremely)</strong></label><br>
+      <label><strong>Fatigue? (1=none, 5=extreme)</strong></label><br>
       <select id="fatigueSelect">
         <option value="">-- Select --</option>
-        <option value="1">1 (No fatigue)</option>
+        <option value="1">1</option>
         <option value="2">2</option>
-        <option value="3">3 (Moderate)</option>
+        <option value="3">3</option>
         <option value="4">4</option>
-        <option value="5">5 (Very fatigued)</option>
+        <option value="5">5</option>
       </select>
       <br><br>
 
@@ -391,7 +377,7 @@ function showQuestionnaire() {
 }
 
 /*****************************************************
- * 12) COLLECT & SEND DATA TO GOOGLE APPS SCRIPT
+ * 12) COLLECT & SEND VIA HIDDEN FORM
  *****************************************************/
 function collectQuestionnaireAndSend() {
   // Collect user data
@@ -410,31 +396,19 @@ function collectQuestionnaireAndSend() {
     forcedChoiceResponses: responses
   };
 
+  // 1) Get the hidden field, store the JSON
+  const hiddenData = document.getElementById("hiddenData");
+  hiddenData.value = JSON.stringify(fullData);
 
+  // 2) Submit the form
+  //    This does a normal form POST to Apps Script, so no CORS issues
+  document.getElementById("myForm").submit();
 
-
-
-fetch(APPS_SCRIPT_URL, {
-  method: "POST",
-  mode: "no-cors",  // <--- important
-  headers: {
-    // Must be "simple" headers if you do no-cors
-    "Content-Type": "text/plain"
-  },
-  body: JSON.stringify(fullData)
-})
-.then(() => {
-   // You won't get a real response, but at least your code continues
-   console.log("Attempted no-cors request");
-   container.innerHTML = "<h2>Thank you!</h2><p>We attempted to save your data.</p>";
-})
-.catch(err => {
-   console.error("Error sending data in no-cors mode:", err);
-   alert("Oops, something prevented even the no-cors request from going out.");
-});
-
+  // 3) The browser will navigate to the script's response page
+  //    If you want to remain on your site, you'd do an iframe approach or accept the redirect.
+}
 
 /*****************************************************
- * INIT: Show Intro on page load
+ * INIT
  *****************************************************/
 window.onload = showIntro;
