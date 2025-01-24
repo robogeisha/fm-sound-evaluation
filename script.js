@@ -1,3 +1,6 @@
+/*****************************************************
+ * 1) GLOBAL VARIABLES
+ *****************************************************/
 let userData = {
   hearing: "",
   musicTrainingYears: "",
@@ -97,7 +100,7 @@ function buildTrials() {
  * 4) INTRO PAGE
  *****************************************************/
 function showIntro() {
-  container.innerHTML = 
+  container.innerHTML = `
     <div class="text-slide">
       <h2>Welcome to the Kick FM Detection Test</h2>
       <p>
@@ -134,7 +137,7 @@ function showIntro() {
 
       <button id="introNext" class="btn">Continue</button>
     </div>
-  ;
+  `;
   progressBar.style.width = "0%";
 
   document.getElementById("introNext").addEventListener("click", showEnvironmentPage);
@@ -144,7 +147,7 @@ function showIntro() {
  * 5) ENVIRONMENT PAGE
  *****************************************************/
 function showEnvironmentPage() {
-  container.innerHTML = 
+  container.innerHTML = `
     <div class="text-slide">
       <h2>Listening Environment & Equipment</h2>
       <ul style="text-align:left;">
@@ -155,7 +158,7 @@ function showEnvironmentPage() {
       <p>Click "Start Test" when ready.</p>
       <button id="envNext" class="btn">Start Test</button>
     </div>
-  ;
+  `;
   progressBar.style.width = "0%";
 
   document.getElementById("envNext").addEventListener("click", startTest);
@@ -179,11 +182,11 @@ function loadTrial() {
   }
 
   const percent = (currentTrial / trials.length) * 100;
-  progressBar.style.width = ${percent}%;
+  progressBar.style.width = `${percent}%`;
 
   const trial = trials[currentTrial];
 
-  container.innerHTML = 
+  container.innerHTML = `
     <div style="text-align: center;">
       <h2>Trial ${currentTrial + 1} of ${trials.length}</h2>
       <p>You can only play each sample <strong>twice</strong>. Which sample is modulated?</p>
@@ -204,7 +207,7 @@ function loadTrial() {
       <button id="buttonA" class="btn">Sample A</button>
       <button id="buttonB" class="btn">Sample B</button>
     </div>
-  ;
+  `;
 
   const localPlayCount = {
     [trial.sampleA]: 0,
@@ -270,7 +273,7 @@ function endTest() {
  * 11) QUESTIONNAIRE
  *****************************************************/
 function showQuestionnaire() {
-  container.innerHTML = 
+  container.innerHTML = `
     <div class="text-slide" style="text-align:left;">
       <h2>Final Questionnaire</h2>
       <p>Please answer these questions.</p>
@@ -356,7 +359,7 @@ function showQuestionnaire() {
 
       <button id="finishButton" class="btn">Finish</button>
     </div>
-  ;
+  `;
 
   document.getElementById("finishButton").addEventListener("click", collectQuestionnaireAndSend);
 }
