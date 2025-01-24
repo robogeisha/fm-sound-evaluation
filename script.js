@@ -1,7 +1,8 @@
-/*****************************************************
- * 1) GLOBAL VARIABLES
- *****************************************************/
+// *****************************************************
+// 1) GLOBAL VARIABLES
+// *****************************************************
 let userData = {
+  sex: "",  // <-- Added sex field
   hearing: "",
   musicTrainingYears: "",
   productionExp: "",
@@ -60,9 +61,9 @@ const responses = [];
 const container   = document.getElementById("slide-container");
 const progressBar = document.getElementById("progress-bar");
 
-/*****************************************************
- * 2) HELPER: SHUFFLE
- *****************************************************/
+// *****************************************************
+// 2) HELPER: SHUFFLE
+// *****************************************************
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -70,9 +71,9 @@ function shuffle(array) {
   }
 }
 
-/*****************************************************
- * 3) BUILD TRIALS
- *****************************************************/
+// *****************************************************
+// 3) BUILD TRIALS
+// *****************************************************
 function buildTrials() {
   stimuli.forEach(block => {
     const refFile = block.ref;
@@ -96,9 +97,9 @@ function buildTrials() {
   shuffle(trials);
 }
 
-/*****************************************************
- * 4) INTRO PAGE
- *****************************************************/
+// *****************************************************
+// 4) INTRO PAGE
+// *****************************************************
 function showIntro() {
   container.innerHTML = `
     <div class="text-slide">
@@ -143,9 +144,9 @@ function showIntro() {
   document.getElementById("introNext").addEventListener("click", showEnvironmentPage);
 }
 
-/*****************************************************
- * 5) ENVIRONMENT PAGE
- *****************************************************/
+// *****************************************************
+// 5) ENVIRONMENT PAGE
+// *****************************************************
 function showEnvironmentPage() {
   container.innerHTML = `
     <div class="text-slide">
@@ -164,17 +165,17 @@ function showEnvironmentPage() {
   document.getElementById("envNext").addEventListener("click", startTest);
 }
 
-/*****************************************************
- * 6) START THE 2AFC TEST
- *****************************************************/
+// *****************************************************
+// 6) START THE 2AFC TEST
+// *****************************************************
 function startTest() {
   buildTrials();
   loadTrial();
 }
 
-/*****************************************************
- * 7) LOAD A TRIAL
- *****************************************************/
+// *****************************************************
+// 7) LOAD A TRIAL
+// *****************************************************
 function loadTrial() {
   if (currentTrial >= trials.length) {
     endTest();
@@ -226,9 +227,9 @@ function loadTrial() {
   document.getElementById("buttonB").addEventListener("click", () => handleResponse("B"));
 }
 
-/*****************************************************
- * 8) ENFORCE TWO-PLAY
- *****************************************************/
+// *****************************************************
+// 8) ENFORCE TWO-PLAY
+// *****************************************************
 function handlePlay(url, audioElem, localPlayCount) {
   localPlayCount[url]++;
   if (localPlayCount[url] > 2) {
@@ -238,9 +239,9 @@ function handlePlay(url, audioElem, localPlayCount) {
   }
 }
 
-/*****************************************************
- * 9) HANDLE A RESPONSE
- *****************************************************/
+// *****************************************************
+// 9) HANDLE A RESPONSE
+// *****************************************************
 function handleResponse(chosen) {
   const trial = trials[currentTrial];
   const isCorrect = (chosen === trial.correctAnswer);
@@ -261,22 +262,32 @@ function handleResponse(chosen) {
   loadTrial();
 }
 
-/*****************************************************
- * 10) END TEST
- *****************************************************/
+// *****************************************************
+// 10) END TEST
+// *****************************************************
 function endTest() {
   progressBar.style.width = "100%";
   showQuestionnaire();
 }
 
-/*****************************************************
- * 11) QUESTIONNAIRE
- *****************************************************/
+// *****************************************************
+// 11) QUESTIONNAIRE
+// *****************************************************
 function showQuestionnaire() {
   container.innerHTML = `
     <div class="text-slide" style="text-align:left;">
       <h2>Final Questionnaire</h2>
       <p>Please answer these questions.</p>
+
+      <!-- New Sex Field -->
+      <label>Sex:</label><br>
+      <select id="sexSelect">
+        <option value="">-- Select --</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <br><br>
 
       <label>Do you have normal hearing?</label><br>
       <select id="hearingSelect">
@@ -364,19 +375,20 @@ function showQuestionnaire() {
   document.getElementById("finishButton").addEventListener("click", collectQuestionnaireAndSend);
 }
 
-/*****************************************************
- * 12) COLLECT & SUBMIT FORM
- *****************************************************/
+// *****************************************************
+// 12) COLLECT & SUBMIT FORM
+// *****************************************************
 function collectQuestionnaireAndSend() {
   // Collect user data
-  userData.hearing            = document.getElementById("hearingSelect").value;
-  userData.musicTrainingYears = document.getElementById("musicSelect").value;
-  userData.productionExp      = document.getElementById("productionSelect").value;
-  userData.device             = document.getElementById("deviceSelect").value;
-  userData.environment        = document.getElementById("envSelect").value;
-  userData.confidence         = document.getElementById("confidenceSelect").value;
-  userData.difficulty         = document.getElementById("difficultySelect").value;
-  userData.fatigue            = document.getElementById("fatigueSelect").value;
+  userData.sex               = document.getElementById("sexSelect").value;       // <-- Capture the sex field
+  userData.hearing           = document.getElementById("hearingSelect").value;
+  userData.musicTrainingYears= document.getElementById("musicSelect").value;
+  userData.productionExp     = document.getElementById("productionSelect").value;
+  userData.device            = document.getElementById("deviceSelect").value;
+  userData.environment       = document.getElementById("envSelect").value;
+  userData.confidence        = document.getElementById("confidenceSelect").value;
+  userData.difficulty        = document.getElementById("difficultySelect").value;
+  userData.fatigue           = document.getElementById("fatigueSelect").value;
 
   // Combine everything
   const fullData = {
@@ -390,11 +402,13 @@ function collectQuestionnaireAndSend() {
 
   // Submit the form
   document.getElementById("myForm").submit();
-
-  // The user will then navigate to the script's success page
 }
 
-/*****************************************************
- * INIT
- *****************************************************/
+// *****************************************************
+// INIT
+// *****************************************************
 window.onload = showIntro;
+</script>
+
+</body>
+</html>
