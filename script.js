@@ -1,5 +1,4 @@
 let userData = {
-  sex: ""
   hearing: "",
   musicTrainingYears: "",
   productionExp: "",
