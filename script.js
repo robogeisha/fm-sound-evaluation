@@ -1,8 +1,5 @@
-// *****************************************************
-// 1) GLOBAL VARIABLES
-// *****************************************************
 let userData = {
-  sex: "",  // <-- Added sex field
+  sex: ""
   hearing: "",
   musicTrainingYears: "",
   productionExp: "",
@@ -61,9 +58,9 @@ const responses = [];
 const container   = document.getElementById("slide-container");
 const progressBar = document.getElementById("progress-bar");
 
-// *****************************************************
-// 2) HELPER: SHUFFLE
-// *****************************************************
+/*****************************************************
+ * 2) HELPER: SHUFFLE
+ *****************************************************/
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -71,9 +68,9 @@ function shuffle(array) {
   }
 }
 
-// *****************************************************
-// 3) BUILD TRIALS
-// *****************************************************
+/*****************************************************
+ * 3) BUILD TRIALS
+ *****************************************************/
 function buildTrials() {
   stimuli.forEach(block => {
     const refFile = block.ref;
@@ -97,11 +94,11 @@ function buildTrials() {
   shuffle(trials);
 }
 
-// *****************************************************
-// 4) INTRO PAGE
-// *****************************************************
+/*****************************************************
+ * 4) INTRO PAGE
+ *****************************************************/
 function showIntro() {
-  container.innerHTML = `
+  container.innerHTML = 
     <div class="text-slide">
       <h2>Welcome to the Kick FM Detection Test</h2>
       <p>
@@ -138,17 +135,17 @@ function showIntro() {
 
       <button id="introNext" class="btn">Continue</button>
     </div>
-  `;
+  ;
   progressBar.style.width = "0%";
 
   document.getElementById("introNext").addEventListener("click", showEnvironmentPage);
 }
 
-// *****************************************************
-// 5) ENVIRONMENT PAGE
-// *****************************************************
+/*****************************************************
+ * 5) ENVIRONMENT PAGE
+ *****************************************************/
 function showEnvironmentPage() {
-  container.innerHTML = `
+  container.innerHTML = 
     <div class="text-slide">
       <h2>Listening Environment & Equipment</h2>
       <ul style="text-align:left;">
@@ -159,23 +156,23 @@ function showEnvironmentPage() {
       <p>Click "Start Test" when ready.</p>
       <button id="envNext" class="btn">Start Test</button>
     </div>
-  `;
+  ;
   progressBar.style.width = "0%";
 
   document.getElementById("envNext").addEventListener("click", startTest);
 }
 
-// *****************************************************
-// 6) START THE 2AFC TEST
-// *****************************************************
+/*****************************************************
+ * 6) START THE 2AFC TEST
+ *****************************************************/
 function startTest() {
   buildTrials();
   loadTrial();
 }
 
-// *****************************************************
-// 7) LOAD A TRIAL
-// *****************************************************
+/*****************************************************
+ * 7) LOAD A TRIAL
+ *****************************************************/
 function loadTrial() {
   if (currentTrial >= trials.length) {
     endTest();
@@ -183,11 +180,11 @@ function loadTrial() {
   }
 
   const percent = (currentTrial / trials.length) * 100;
-  progressBar.style.width = `${percent}%`;
+  progressBar.style.width = ${percent}%;
 
   const trial = trials[currentTrial];
 
-  container.innerHTML = `
+  container.innerHTML = 
     <div style="text-align: center;">
       <h2>Trial ${currentTrial + 1} of ${trials.length}</h2>
       <p>You can only play each sample <strong>twice</strong>. Which sample is modulated?</p>
@@ -208,7 +205,7 @@ function loadTrial() {
       <button id="buttonA" class="btn">Sample A</button>
       <button id="buttonB" class="btn">Sample B</button>
     </div>
-  `;
+  ;
 
   const localPlayCount = {
     [trial.sampleA]: 0,
@@ -227,9 +224,9 @@ function loadTrial() {
   document.getElementById("buttonB").addEventListener("click", () => handleResponse("B"));
 }
 
-// *****************************************************
-// 8) ENFORCE TWO-PLAY
-// *****************************************************
+/*****************************************************
+ * 8) ENFORCE TWO-PLAY
+ *****************************************************/
 function handlePlay(url, audioElem, localPlayCount) {
   localPlayCount[url]++;
   if (localPlayCount[url] > 2) {
@@ -239,9 +236,9 @@ function handlePlay(url, audioElem, localPlayCount) {
   }
 }
 
-// *****************************************************
-// 9) HANDLE A RESPONSE
-// *****************************************************
+/*****************************************************
+ * 9) HANDLE A RESPONSE
+ *****************************************************/
 function handleResponse(chosen) {
   const trial = trials[currentTrial];
   const isCorrect = (chosen === trial.correctAnswer);
@@ -262,32 +259,22 @@ function handleResponse(chosen) {
   loadTrial();
 }
 
-// *****************************************************
-// 10) END TEST
-// *****************************************************
+/*****************************************************
+ * 10) END TEST
+ *****************************************************/
 function endTest() {
   progressBar.style.width = "100%";
   showQuestionnaire();
 }
 
-// *****************************************************
-// 11) QUESTIONNAIRE
-// *****************************************************
+/*****************************************************
+ * 11) QUESTIONNAIRE
+ *****************************************************/
 function showQuestionnaire() {
-  container.innerHTML = `
+  container.innerHTML = 
     <div class="text-slide" style="text-align:left;">
       <h2>Final Questionnaire</h2>
       <p>Please answer these questions.</p>
-
-      <!-- New Sex Field -->
-      <label>Sex:</label><br>
-      <select id="sexSelect">
-        <option value="">-- Select --</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
-      </select>
-      <br><br>
 
       <label>Do you have normal hearing?</label><br>
       <select id="hearingSelect">
@@ -370,25 +357,24 @@ function showQuestionnaire() {
 
       <button id="finishButton" class="btn">Finish</button>
     </div>
-  `;
+  ;
 
   document.getElementById("finishButton").addEventListener("click", collectQuestionnaireAndSend);
 }
 
-// *****************************************************
-// 12) COLLECT & SUBMIT FORM
-// *****************************************************
+/*****************************************************
+ * 12) COLLECT & SUBMIT FORM
+ *****************************************************/
 function collectQuestionnaireAndSend() {
   // Collect user data
-  userData.sex               = document.getElementById("sexSelect").value;       // <-- Capture the sex field
-  userData.hearing           = document.getElementById("hearingSelect").value;
-  userData.musicTrainingYears= document.getElementById("musicSelect").value;
-  userData.productionExp     = document.getElementById("productionSelect").value;
-  userData.device            = document.getElementById("deviceSelect").value;
-  userData.environment       = document.getElementById("envSelect").value;
-  userData.confidence        = document.getElementById("confidenceSelect").value;
-  userData.difficulty        = document.getElementById("difficultySelect").value;
-  userData.fatigue           = document.getElementById("fatigueSelect").value;
+  userData.hearing            = document.getElementById("hearingSelect").value;
+  userData.musicTrainingYears = document.getElementById("musicSelect").value;
+  userData.productionExp      = document.getElementById("productionSelect").value;
+  userData.device             = document.getElementById("deviceSelect").value;
+  userData.environment        = document.getElementById("envSelect").value;
+  userData.confidence         = document.getElementById("confidenceSelect").value;
+  userData.difficulty         = document.getElementById("difficultySelect").value;
+  userData.fatigue            = document.getElementById("fatigueSelect").value;
 
   // Combine everything
   const fullData = {
@@ -402,13 +388,11 @@ function collectQuestionnaireAndSend() {
 
   // Submit the form
   document.getElementById("myForm").submit();
+
+  // The user will then navigate to the script's success page
 }
 
-// *****************************************************
-// INIT
-// *****************************************************
+/*****************************************************
+ * INIT
+ *****************************************************/
 window.onload = showIntro;
-</script>
-
-</body>
-</html>
